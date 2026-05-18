@@ -1,0 +1,224 @@
+基礎問題（6問）										
+1. JSPにおけるリクエストの処理										
+	問題： JSPでリクエストパラメータを取得する場合、次のコードを実行すると出力結果はどうなりますか？									
+	<%									
+	    String name = request.getParameter("name");									
+	    out.print(name);									
+	%>									
+	URL: test.jsp?name=John&name=Jane									
+										
+	A. John が表示される									
+	B. Jane が表示される									
+	C. John,Jane が表示される									
+	D. null が表示される									
+	→A									
+2. リクエストパラメータの型変換（難易度高め）										
+	問題： 次のコードを実行した場合、出力結果として 正しいもの を選んでください。									
+	<%									
+	    String numStr = request.getParameter("num");									
+	    int num = Integer.parseInt(numStr);									
+	    out.print(num * 2);									
+	%>									
+	URL: test.jsp?num=05									
+										
+	A. 10 が表示される									
+	B. 5 が表示される									
+	C. 実行時エラーが発生する									
+	D. コンパイルエラーが発生する									
+	→A									
+3. リクエストのエンコーディング										
+	問題： 次のコードを実行した場合、日本語のパラメータが正しく表示されない原因として 最も適切なもの を選んでください。									
+										
+	<%									
+	    String message = request.getParameter("message");									
+	    out.print(message);									
+	%>									
+	URL: test.jsp?message=こんにちは									
+										
+	A. request.getParameter() では日本語は取得できない									
+	B. <%@ page contentType="text/html" %> が指定されていないため									
+	C. サーバーのデフォルトエンコーディングが ISO-8859-1 のため									
+	D. パラメータに & が含まれているため									
+	→C									
+4. エラーページの設定										
+	問題： 次のJSPコードのエラーページ設定で、正しく動作するもの を選んでください。									
+										
+	error.jsp									
+	<%@ page isErrorPage="true" %>									
+	<%= exception.getMessage() %>									
+										
+	test.jsp									
+	<%@ page errorPage="error.jsp" %>									
+	<%									
+	    int num = Integer.parseInt("abc");									
+	%>									
+										
+	A. abc が表示される									
+	B. NumberFormatException が表示される									
+	C. 空白のページが表示される									
+	D. コンパイルエラーが発生する									
+	→B									
+5. includeとforwardの違い										
+	問題： 次のJSPコードの出力結果として 正しいもの を選んでください。									
+										
+	<%@ include file="header.jsp" %>									
+	<jsp:forward page="footer.jsp" />									
+	<%= "Hello JSP!" %>									
+	A. header.jsp の内容と footer.jsp の内容が表示される									
+	B. header.jsp の内容のみ表示される									
+	C. footer.jsp の内容のみ表示される									
+	D. header.jsp の内容と Hello JSP! が表示される									
+	→C									
+6. 基礎実装										
+	以下の条件に従って、数値を入力してその2乗を表示するJSPファイルを作成してください。									
+										
+	1. chapter8 フォルダ内に square-in.jsp、square-out.jsp、square-error.jsp を作成すること。									
+	2. square-in.jsp では数値を入力するフォームを作成すること。									
+	3. square-out.jsp ではリクエストパラメータで受け取った数値の2乗を計算して表示すること。									
+	4. 数値以外が入力された場合は square-error.jsp にエラーページを表示すること。									
+	5. 出力される画面は以下のような内容になるようにすること：									
+										
+	入力した数値：5 結果：25									
+
+	
+										
+		
+応用問題										
+1. リクエストパラメータのエンコーディング										
+問題： 次のJSPコードの出力結果として 正しいもの を選んでください。										
+	<%									
+	    request.setCharacterEncoding("UTF-8");									
+	    String message = request.getParameter("message");									
+	    out.print(message);									
+	%>									
+	URL: test.jsp?message=こんにちは									
+										
+	A. こんにちは が表示される									
+	B. ????? が表示される									
+	C. 空白が表示される									
+	D. 実行時エラーが発生する									
+	→B									
+2. リクエストのスコープ										
+問題： 次の JSP コードの出力結果として 正しいもの を選んでください。										
+										
+	page1.jsp									
+	<%									
+	    request.setAttribute("username", "Alice");									
+	    response.sendRedirect("page2.jsp");									
+	%>									
+										
+	page2.jsp									
+	<%= request.getAttribute("username") %>									
+										
+	A. Alice が表示される									
+	B. null が表示される									
+	C. コンパイルエラーが発生する									
+	D. 実行時エラーが発生する									
+	→B									
+3. リクエストディスパッチ										
+問題： 次のJSPコードの出力結果として 正しいもの を選んでください。										
+										
+	main.jsp									
+	<%									
+	    request.setAttribute("name", "John");									
+	    RequestDispatcher rd = request.getRequestDispatcher("sub.jsp");									
+	    rd.forward(request, response);									
+	    out.print("Hello, ");									
+	%>									
+										
+	sub.jsp									
+	<%= request.getAttribute("name") %>									
+										
+	A. Hello, John が表示される									
+	B. John が表示される									
+	C. Hello, が表示される									
+	D. 空白のページが表示される									
+	→B									
+4. includeディレクティブとjsp:includeの違い										
+問題： 次のJSPコードの出力結果として 正しいもの を選んでください。										
+										
+	header.jsp									
+	<%									
+	    String title = "Welcome";									
+	%>									
+	<h1><%= title %></h1>									
+										
+	main.jsp									
+	<%@ include file="header.jsp" %>									
+	<h2><%= title %></h2>									
+	A. <h1>Welcome</h1><h2>Welcome</h2> が表示される									
+	B. <h1>Welcome</h1><h2></h2> が表示される									
+	C. コンパイルエラーが発生する									
+	D. 実行時エラーが発生する									
+	→A									
+5. エラーページの継承										
+										
+	問題： 次のJSPコードの出力結果として 正しいもの を選んでください。									
+	parent.jsp									
+	<%@ page errorPage="error.jsp" %>									
+	<%									
+	    int result = 10 / 0;									
+	%>									
+										
+	child.jsp									
+	<%@ include file="parent.jsp" %>									
+										
+	error.jsp									
+	<%@ page isErrorPage="true" %>									
+	エラー: <%= exception.getMessage() %>									
+	A. エラー: / by zero が表示される									
+	B. 空白のページが表示される									
+	C. コンパイルエラーが発生する									
+	D. 実行時エラーが発生する									
+	→A									
+6. JSP エラーページ設定										
+										
+	問題： 上記のコードについて、次の記述のうち誤っているものはどれか。									
+	main.jsp									
+	<%@ page errorPage="handler.jsp" %>									
+	<%									
+	    int x = 10 / 0;									
+	%>									
+										
+	handler.jsp									
+	<%@ page isErrorPage="true" %>									
+	エラー発生：<%= exception.getClass().getSimpleName() %>									
+										
+	noHandler.jsp									
+	%@ int y = 10 / 0; @%									
+	A. main.jsp にアクセスすると、									
+	　「エラー発生：ArithmeticException」と表示される。									
+	B. handler.jsp では exception オブジェクトに直接アクセスできる。									
+	C. handler.jsp の isErrorPage を false に変更しても、例外名は正常に表示される。									
+	D. noHandler.jsp にアクセスすると、サーバーのデフォルトの 500 エラーページが表示される。									
+	→C									
+										
+										
+										
+✅ 統合課題										
+問題： リクエストの処理とエラーページの統合課題										
+	次の要件を満たす JSPアプリケーション を作成してください。									
+										
+	要件									
+	入力用の JSP（input.jsp）									
+	ユーザー名（username）と年齢（age）を入力するフォームを作成									
+	username は 必須入力（未入力の場合、エラーページへ）									
+	age は 整数のみ許可（数字以外の場合、エラーページへ）									
+	出力用の JSP（output.jsp）									
+										
+	username と age を受け取り、次のように表示									
+	ユーザー名: Alice									
+	年齢: 25									
+										
+	エラーページ（error.jsp）									
+	入力エラーの場合、次のように表示									
+	入力エラー: ユーザー名または年齢が正しくありません。									
+										
+	注意点									
+	リクエストパラメータの null チェックと isEmpty() チェック を正しく行うこと									
+	Integer.parseInt() を使用して年齢を数値に変換（例外処理を行う）									
+	error.jsp には isErrorPage="true" を設定し、exception.getMessage() を表示すること									
+	設計のヒント									
+	input.jsp でフォームを作成し、output.jsp に POST メソッドで送信									
+	output.jsp でリクエストパラメータを取得し、Integer.parseInt() で年齢を数値に変換									
+	例外が発生した場合は、errorPage="error.jsp" で error.jsp に遷移									

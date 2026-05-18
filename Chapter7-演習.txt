@@ -1,0 +1,168 @@
+基礎問題（7問）										
+1. JSPの仕組み										
+	問題： JSPはサーバー上でどのように動作しますか？次の選択肢から正しいものを選んでください。									
+	A. クライアント側でHTMLに変換されて表示される									
+	B. サーバー側でJavaサーブレットに変換されて実行される									
+	C. クライアント側でJavaScriptに変換されて実行される									
+	D. サーバー側でHTMLに直接変換される									
+	→B									
+2. はじめてのJSP										
+	問題： 最も基本的なJSPの書き方として正しいものを選んでください。									
+	A. <html><body><scriptlet>System.out.println("Hello, JSP!");</scriptlet></body></html>									
+	B. <html><body><% out.print("Hello, JSP!"); %></body></html>									
+	C. <html><body><%= "Hello, JSP!" %></body></html>									
+	D. <html><body><?php echo "Hello, JSP!"; ?></body></html>									
+	→B									
+3. includeディレクティブ										
+	問題： 次のうち、 JSPのincludeディレクティブ の正しい使い方はどれですか？									
+										
+	A. <jsp:include page="header.jsp" />									
+	B. <%@ include file="header.jsp" %>									
+	C. <include src="header.jsp" />									
+	D. <% include "header.jsp"; %>									
+	→B									
+4. スクリプトレット										
+	問題： スクリプトレット <% ... %> 内に書けるものとして 正しい選択肢 を選んでください。									
+										
+	A. HTML タグ									
+	B. JavaScript									
+	C. Java コード									
+	D. SQL 文									
+	→C									
+5. クラスのインポート										
+	問題： JSPで ArrayList クラスを使用するために必要なインポート文はどれですか？									
+										
+	A. <%@ import="java.util.ArrayList" %>									
+	B. <%@ page import="java.util.ArrayList" %>									
+	C. <%@ include import="java.util.ArrayList" %>									
+	D. <% import java.util.ArrayList; %>									
+	→B																
+6. JSP宣言										
+	問題：JSPでメンバ変数を宣言するために使用する正しい記述はどれですか？									
+										
+	A. <% int count = 0; %>									
+	B. <%! int count = 0; %>									
+	C. <%= int count = 0; %>									
+	D. <%@ declaration int count = 0; %>									
+	→B									
+7. 基礎実装										
+	以下の条件に従って、ユーザーの名前を表示するJSPファイルを作成してください。									
+										
+	1. Chapter7 フォルダ内に practice01.jsp を作成すること。									
+	2. スクリプトレットを使って変数を宣言し、自分の名前を代入すること。									
+	3. 式（<%= %>）を使って名前を出力すること。									
+	4. 出力される画面は以下のような内容になるようにすること：									
+										
+	こんにちは、田中さん！JSPの世界へようこそ。
+								
+	<%@ page language="java" contentType="text/html; charset=UTF-8"
+		pageEncoding="UTF-8"%>
+	<%@include file="../header.html"%>
+
+	<p>
+		<%
+		String name = "近畑";
+		%>
+	</p>
+
+	<p>
+	"	こんにちは、<%=name%>さん！JSPの世界へようこそ。
+	</p>
+
+	<%@include file="../footer.html"%>									
+	●URL									
+	http://localhost:8080/Chapter7/chapter7/practice01									
+										
+										
+✅ 応用問題（5問）										
+1. JSPの仕組み										
+	問題： JSPがJavaサーブレットに変換された後、生成されるメソッド名はどれですか？									
+										
+	A. doPost()									
+	B. doGet()									
+	C. _jspService()									
+	D. service()									
+	→C									
+2. スクリプトレットの正しい使い方										
+	問題： 次のJSPコードで、正しく動作するもの を選んでください。									
+		<% int count = 0; %>								
+		<% count++; %>								
+		<%= count %>								
+										
+		A. エラーが発生する								
+		B. 0 が表示される								
+		C. 1 が表示される								
+		D. コンパイルエラーが発生する								
+		→C								
+3. includeディレクティブ vs jsp:include										
+	問題： includeディレクティブ と jsp:include の違いとして 正しいもの を選んでください。									
+										
+	A. 両方ともコンパイル時に読み込まれる									
+	B. includeディレクティブ は コンパイル時、jsp:include は 実行時 に読み込まれる									
+	C. 両方とも実行時に読み込まれる									
+	D. includeディレクティブ は 実行時、jsp:include は コンパイル時 に読み込まれる									
+	→B									
+4. スクリプトレットと式の違いを理解する										
+	問題： 次のJSPコードが出力する結果として正しいものを選んでください。									
+										
+	<% 									
+	    int x = 5;									
+	    int y = 10;									
+	    int sum = x + y;									
+	%>									
+	<%= x %> + <%= y %> = <%= sum %>									
+	<% sum = x * y; %>									
+	<%= x %> * <%= y %> = <%= sum %>									
+										
+	A. 5 + 10 = 15 5 * 10 = 15									
+	B. 5 + 10 = 15 5 * 10 = 50									
+	C. 5 + 10 = 50 5 * 10 = 50									
+	D. コンパイルエラーが発生する									
+	→B									
+5. includeディレクティブとjsp:includeの使い分け										
+	問題： 次の JSP コードの出力として 正しいもの を選んでください。									
+	header.jsp									
+	<h1>Header</h1>									
+	footer.jsp									
+	jsp									
+	コピーする									
+	編集する									
+	<%									
+	    out.print("<footer>Copyright 2025</footer>");									
+	%>									
+										
+	main.jsp									
+	<%@ include file="header.jsp" %>									
+	<jsp:include page="footer.jsp" />									
+										
+	期待する出力：									
+	A. Header <footer>Copyright 2025</footer>									
+	B. <h1>Header</h1> Copyright 2025									
+	C. <h1>Header</h1> <footer>Copyright 2025</footer>									
+	D. コンパイルエラーが発生する									
+	→C									
+統合課題（1問）										
+問題： JSPページを作成										
+次の要件を満たす JSP ページを作成してください。										
+	includeディレクティブ を使って header.jsp を読み込む									
+	スクリプトレット を使って現在の日付を取得									
+	式 <%= ... %> を使って日付を表示									
+	クラスのインポート で java.util.Date を使用		
+	
+	<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+①	<%@include file="../header.jsp"%>
+
+②	<%
+	Date today = new Date();
+	%>
+
+③	<p>
+		今日の日付は、<%=today%>です。
+	</p>
+
+④	<%@ page import="java.util.Date"%>
+
+	</body>
+	</html>
+								
