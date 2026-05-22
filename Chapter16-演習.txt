@@ -1,0 +1,120 @@
+【基礎問題1】													
+													
+【問題】													
+問題1: スコープの基本													
+次のスコープの説明が正しいかどうか判断し、間違っている場合は修正してください。													
+1. リクエストスコープは、1つのリクエストの間のみデータを保持できる。													
+2. セッションスコープは、サーバーが再起動してもデータが保持される。		
+→誤り。セッションスコープのデータの保持はブラウザを閉じるまで、もしくは一定時間が経過すると保持できなくなる。当然サーバーが再起動した場合、保持はできない。											
+3. アプリケーションスコープは、同じクライアントの間でのみデータを共有できる。													
+→誤り。正しくは、「アプリケーションスコープは、同じアプリケーションの間でデータを共有できる」である。
+													
+問題2: リクエストスコープの活用													
+以下のサーブレットでは、リクエストスコープを使用してJSPにデータを渡しています。													
+このコードを補完し、正しくデータを渡せるようにしてください。													
+
+@WebServlet("/chapter16/requestScopeServlet")
+
+public class RequestScopeServlet extends HttpServlet {
+
+    protected void doGet(
+    		HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    	 // 属性名:「message」 	「Hello, Request Scope!」
+    	request.setAttribute("message", "Hello, Request Scope!");
+    	
+
+
+        RequestDispatcher dispatcher = request.getRequestDispatcher("display.jsp");
+
+        dispatcher.forward(request, response);
+
+    }
+
+}
+
+また、display.jspにフォワードしリクエストが終了した後、リクエスト属性のmessageは取得できるでしょうか。													
+理由を説明して下さい。													
+→取得できない。理由は、リクエストスコープは1回のリクエストの処理が終わると機能しないため、
+display.jspがブラウザにレスポンスを返した時点で1回のリクエストは完了し、その後の処理はできないから。	
+							
+問題3: セッションスコープの利用													
+以下のサーブレットでは、セッションスコープを使用してカウントを保持しています。													
+このコードの TODO を適切に埋めて、カウンターが正しく増加するようにしてください。													
+
+@WebServlet("/chapter16/SessionCounterServlet")
+public class SessionCounterServlet extends HttpServlet {
+
+	protected void doGet(
+			HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		HttpSession session = request.getSession();
+		
+	        // セッションスコープで "counter" という属性を取得
+		Integer counter = (Integer) session.getAttribute("counter");
+		
+		if (counter == null) {
+	            counter = 1;
+	        } else {
+	            // TODO: カウンターを1増やす
+	        	counter++;
+	        }
+
+	        // TODO: セッションスコープにカウンターをセット
+		session.setAttribute("counter", counter);
+
+
+	     response.setContentType("text/html; charset=UTF-8");
+	     PrintWriter out = response.getWriter();
+	     out.println("<h1>現在のカウント: " + counter + "</h1>");
+
+	    }
+
+}
+			
+また、このカウンターはどのタイミングでリセットされるか？													
+→セッションスコープは、ブラウザを閉じるか、一定時間の経過でリセットされるため、
+①一定時間が経過してタイムアウトした時
+②ブラウザを閉じた時
+これらのタイミングでリセットされる。
+	
+問題4: アプリケーションスコープの利用													
+以下のコードは、アプリケーションスコープを使ってアクセスカウントを管理しようとしていますが、誤りがあります。													
+どこが間違っているか指摘し、修正してください。	
+→nullだった場合の処理が書かれてない。
+   							  【修正版】												
+@WebServlet("/appCounter")
+public class ApplicationCounterServlet extends HttpServlet {
+
+    protected void doGet(
+    		HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+       
+        Integer counter = (Integer) getServletContext().getAttribute("counter");
+        
+        // nullの場合の処理を入れる
+        if (counter == null) {
+            counter = 1;
+        } else {
+            counter++; 
+        }
+        
+        getServletContext().setAttribute("counter", counter);
+        
+        response.setContentType("text/html; charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        out.println("<h1>アプリ全体のアクセス数: " + counter + "</h1>");
+    }
+}
+													
+問題5: 適切なスコープの選択													
+次の状況に最適なスコープを選び、その理由を説明してください。													
+1. ショッピングカートの中身を保持する場合
+→セッションスコープ
+ユーザーが買い物を継続している限りどれだけ画面遷移してもデータが保持されるため、カートの中身のデータを失わずに済むから。						
+2. ログインユーザーの情報を保持する場合		
+→セッションスコープ
+ショッピングカート同様、画面を閉じない限りずっとログインユーザーの情報を保持し続けられるから。											
+3. 全ユーザーのアクセス数をカウントする場合		
+→アプリケーションスコープ
+アプリケーションスコープであれば、アプリを使っている全てのユーザーの情報が共有されるため、全ユーザーのアクセス数も当然カウントすることができる。					
+4. 一度のリクエスト内でデータを受け渡す場合	
+→リクエストスコープ
+一度の画面遷移でしか使わない情報であれば、容量を考慮してリクエストスコープにするべき。				
