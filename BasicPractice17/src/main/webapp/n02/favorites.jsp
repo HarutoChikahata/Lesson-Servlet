@@ -45,4 +45,8 @@
 	%>
 	</ul>
 
+	<form action="ClearServlet" method="post">
+		<input type="submit" value="クリア">
+	</form>
+
 <%@include file="../footer.html" %>
