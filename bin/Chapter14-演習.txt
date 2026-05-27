@@ -1,0 +1,260 @@
+【基礎問題】			
+問1	テキストで使用したproductテーブルを使用します。		
+	商品の価格が高い順、安い順に並び替えるリンクを作成し、押下時に並び替えるサーブレットを作成してください。		
+
+   							  【practice01.jsp】	
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@include file="../header.html" %>
+    
+	<p>
+		<a href="practice01?sort=high">価格の高い順</a>
+		<a href="practice01?sort=low">価格の低い順</a>
+	</p>
+	
+<%@include file="../footer.html" %>
+
+
+    						  【Practice01.java】
+package chapter14;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import tool.Page;
+
+@WebServlet("/chapter14/practice01")
+public class Practice01 extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(
+		HttpServletRequest request, HttpServletResponse response)
+	throws ServletException, IOException {
+		PrintWriter out = response.getWriter();
+		Page.header(out);
+		
+		String sort=request.getParameter("sort");
+		String sql="select * from product";
+		
+		if("high".equals(sort)) {
+			sql += " order by price desc";
+		} else if("low".equals(sort)) {
+			sql += " order by price asc";
+		}
+		
+		try {
+			InitialContext ic = new InitialContext();
+			DataSource ds = (DataSource) ic.lookup(
+					"java:/comp/env/jdbc/book");
+			Connection con = ds.getConnection();
+			
+			PreparedStatement st=con.prepareStatement(sql);
+			ResultSet rs=st.executeQuery();
+			
+			while(rs.next()) {
+				out.println(rs.getInt("id") + ":" + rs.getString("name") + ":" + rs.getInt("price") + "円<br>");
+			}
+			
+			st.close();
+            con.close();
+        } catch (Exception e) {
+            e.printStackTrace(out);
+        }
+        Page.footer(out);
+	}
+
+}
+
+問2	Chapter6で使用した「Select.java」と「select.html」を使用します。		
+	select.htmlで登録した内容を、データベースに保存してください。		
+	「Select.java」と「select.html」に関して、書き換えても構いません。
+	
+   							  【select.html】
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Servlet/JSP Samples</title>
+</head>
+<body>
+
+<form action="Select" method="post">
+	<p>購入数を選択してください。</p>
+	<select name="count">
+		<option value="1">1</option>
+		<option value="2">2</option>
+		<option value="3">3</option>
+		<option value="4">4</option>
+		<option value="5">5</option>
+	</select>
+	
+	<p>購入方法を選択してください。</p>
+	<input type="radio" name="payment" value="カード" checked>カード
+	<input type="radio" name="payment" value="代金引換">代金引換
+	<input type="radio" name="payment" value="銀行振込">銀行振込
+	<input type="radio" name="payment" value="コンビニ">コンビニ
+	
+	<p>商品の感想をお寄せください。</p>
+	<p><textarea name="review" cols="30" rows="5">商品名：</textarea></p>
+	
+	<p>お知らせメールの受信を希望されますか？</p>
+	<p><input type="checkbox" name="mail">オススメ商品のメールを受け取る</p>
+	
+	<p><input type="submit" value="確定"></p>
+</form>
+</body>
+</html>
+
+
+  	                          【Select.java】
+package chapter14;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import tool.Page;
+
+@WebServlet("/chapter14/Select")
+public class Select extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(
+		HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+	}
+
+	protected void doPost(
+		HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		response.setContentType("text/html; charset=UTF-8");
+		PrintWriter out=response.getWriter();
+		
+		request.setCharacterEncoding("UTF-8");
+		String count=request.getParameter("count");
+		String payment=request.getParameter("payment");
+		String review=request.getParameter("review");
+		String mailParam=request.getParameter("mail");
+		
+		String mail = (mailParam != null)? "希望する":"希望しない";
+		
+		Page.header(out);
+		
+		try {
+			InitialContext ic = new InitialContext();
+			DataSource ds = (DataSource) ic.lookup(
+					"java:/comp/env/jdbc/book");
+			Connection con = ds.getConnection();
+			
+			PreparedStatement st=con.prepareStatement(
+					"insert into purchase(count, payment,review,mail) values(?,?,?,?)"
+					);
+			st.setInt(1, Integer.parseInt(count));
+			st.setString(2, payment);
+			st.setString(3,review);
+			st.setString(4, mail);
+			
+			int line=st.executeUpdate();
+			
+			if(line>0){
+				out.println("<h3>注文内容をデータベースに保存しました！</h3>");
+				out.println("<p>購入数: " + count + " 個</p>");
+				out.println("<p>お支払方法: " + payment + "</p>");
+				out.println("<p>ご感想: 「" + review + "」</p>");
+				out.println("<p>お知らせメール: " + mail + "</p>");
+			} else {
+				out.println("<p>データベースへの保存に失敗しました。</p>");
+			}
+			
+			st.close();
+			con.close();
+			
+		} catch (Exception e) {
+			e.printStackTrace(out);
+		}
+		Page.footer(out);
+	}
+
+}
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+【応用問題１】				
+				
+概要				
+シンプルな掲示板を作成する。				
+ユーザーが名前と投稿内容を入力し、掲示板に投稿できる。				
+投稿は一覧表示され、新しい投稿が上に表示される。				
+データはデータベースに保存される。				
+				
+画面イメージ				
+画面デザインについて、画像と同じでなくても問題ございません。				
+見やすいレイアウトを心掛けてください。				
+
+テーブル設計（データベース設計）				
+	posts テーブル（投稿情報）			
+	カラム名	データ型	制約	説明
+	id	INT	PRIMARY KEY, AUTO_INCREMENT	投稿の一意識別子
+	name	VARCHAR(50)	NOT NULL	投稿者名
+	content	TEXT	NOT NULL	投稿内容
+	post_date	TIMESTAMP	DEFAULT CURRENT_TIMESTAMP	投稿日時
+				
+ 画面設計（JSP）				
+	① 掲示板画面（index.jsp）			
+		機能		
+			・投稿フォーム	
+			・投稿一覧表示	
+		項目		
+			・名前（テキストボックス）	
+			・本文（テキストエリア）	
+			・投稿ボタン	
+			・投稿一覧（投稿者名、本文、投稿日時）	
+				
+必要な機能				
+	① 投稿機能			
+		フォームに入力されたデータをサーブレット経由でデータベースに保存する。		
+		投稿後、掲示板画面へリダイレクトする。		
+	② 投稿一覧表示			
+		データベースに保存された投稿を取得し、一覧で表示する。		
+		新しい投稿が上に来るように並べる。		
+	③ 入力チェック（バリデーション）			
+		名前と本文は空欄で投稿できないようにする。		
+	④ 文字化け対策			
+		日本語が正しく表示されるように文字エンコーディングをUTF-8に設定する。		
+				
+				
+発展課題（余力があれば）				
+	・削除機能（投稿を削除できるようにする）			
+	・MVCモデルを使用する			
+--------------------------------------------------------------------------------------------------------------------------------------------
+【応用問題２】
+
+概要
+テキストで使用したproductテーブルを使用します。
+productテーブル内の商品を変更する機能を作成していただきます。
+名前、価格を変更することが可能です。
+どの値をキーとするか、キーとなる値をどのようにして取得するか、方式を考えて作成してください。
+
+

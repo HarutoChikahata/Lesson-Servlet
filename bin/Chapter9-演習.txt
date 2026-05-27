@@ -1,0 +1,350 @@
+✅ 基礎問題（5問）	
+	1. フォワードの仕組み
+	問題： フォワード（forward）の特徴として 正しくないもの を選んでください。
+	
+	A. forward はサーバー内でリクエストを転送する
+	B. クライアント側には URL の変更が見えない
+	C. forward を使用すると、転送前の出力はクリアされる
+	D. forward は response.sendRedirect() と同じ仕組みで動作する
+	→D
+2. RequestDispatcherインターフェース	
+	問題： RequestDispatcher を使って forward する正しいコードを選んでください。
+	A.
+	RequestDispatcher rd = request.getDispatcher("next.jsp");
+	rd.forward(request, response);
+	B.
+	RequestDispatcher rd = request.getRequestDispatcher("next.jsp");
+	rd.forward(response, request);
+	C.
+	RequestDispatcher rd = request.getRequestDispatcher("next.jsp");
+	rd.forward(request, response);
+	D.
+	request.getRequestDispatcher("next.jsp").sendRedirect(request, response);
+	→C
+3. includeメソッドの正しい動作	
+	問題： 次の include メソッドの説明として 正しくないもの を選んでください。
+	
+	A. include は指定された JSP を現在のページに埋め込む
+	B. include は forward と同じく、転送元の出力をクリアする
+	C. include を使うと、ヘッダーやフッターの共通化ができる
+	D. include は forward とは異なり、遷移先の JSP の処理が終了後に元の JSP に戻る
+	→B
+4. sendRedirect の動作	
+	問題： sendRedirect の動作として 正しくないもの を選んでください。
+	
+	A. sendRedirect はクライアント側の URL を変更する
+	B. sendRedirect を使うと、リクエストスコープのデータは保持される
+	C. sendRedirect を使うと、セッションスコープのデータは保持される
+	D. sendRedirect を使うと、異なるドメインにもリダイレクトできる
+	→B
+5. JSPからの画面遷移	
+	問題： JSP から forward を行う正しい方法を選んでください。
+	
+	A. <jsp:include page="next.jsp" />
+	B. <jsp:forward page="next.jsp" />
+	C. <jsp:redirect page="next.jsp" />
+	D. <jsp:goto page="next.jsp" />
+	→B
+--------------------------------------------------------------------------------------------------------------------------------------------
+	【問題】	リダイレクトを使った画面遷移アプリを作成しなさい。
+		
+	【要件】	
+		「送信」ボタンがある画面(index.jsp)
+		完了画面(done.jsp)
+		「送信」ボタンを押したら完了画面へ遷移すること。
+		※画面の内容や項目は自由
+
+
+
+
+						      【index.jsp】
+						      
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>お問い合わせ</title>
+<style>
+    body { font-family: sans-serif; margin: 30px; }
+    .form-group { margin-bottom: 15px; }
+    label { display: inline-block; width: 100px; }
+</style>
+</head>
+<body>
+    
+    <h2>お問い合わせフォーム</h2>
+	
+	<form action="${pageContext.request.contextPath}/chapter9/RedirectServlet" method="post">
+			<div class="form-group">
+					<label for="title">件名</label>
+					<input type="text" id="title" name="title" required>
+			</div>
+			<div class="form-group">
+					<label for="content">内容</label>
+					<textarea id="content" name="content" rows"10" required></textarea>
+			</div>
+			
+			<button type="submit">送信</button>
+	</form>
+	
+<%@include file="../footer.jsp" %>
+
+
+
+
+							  【done.jsp】
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>送信完了</title>
+<style>
+    body { font-family: sans-serif; margin: 30px; text-align: center; }
+    .msg { color: green; font-size: 1.2em; font-weight: bold; }
+</style>
+</head>
+<body>
+    
+    <p class="msg">お問い合わせの送信が完了しました！</p>
+    <p>ありがとうございます！</p>
+    
+    <br>
+    <a href="index.jsp">入力画面に戻る</a>
+	
+<%@include file="../footer.jsp" %>
+
+
+
+
+    						  【RedirectServlet.java】
+
+package chapter9;
+
+import java.io.IOException;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@WebServlet("/chapter9/RedirectServlet")
+public class RedirectServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(
+			HttpServletRequest request, HttpServletResponse response
+			) throws ServletException, IOException {
+			doPost(request, response);
+	}
+
+	protected void doPost(
+			HttpServletRequest request, HttpServletResponse response
+			) throws ServletException, IOException {
+		
+			//文字化け対策
+			request.setCharacterEncoding("UTF-8");
+			
+			String title = request.getParameter("title");
+			String content = request.getParameter("content");
+			System.out.println("受信データ　-> 件名：" + title + ", 内容：" + content);
+			
+			//${pageContext.request.contextPath}に対する命令
+			response.sendRedirect(request.getContextPath() + "/chapter9/done.jsp");
+			
+	}
+
+}
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+✅ 応用問題（5問）	
+1. forward の動作	
+	問題： forward を使用すると、HTTP ステータスコードはどうなるか？
+	
+	A. 200 OK
+	B. 301 Moved Permanently
+	C. 302 Found
+	D. 500 Internal Server Error
+	→A
+2. include の変数スコープ	
+	問題： include を使った場合、転送元の変数を転送先で使用できるか？
+	
+	A. できる
+	B. できない
+	→できる
+3. sendRedirect のステータスコード	
+	問題： sendRedirect は HTTP ステータスコードとして何を返すか？
+	
+	A. 200
+	B. 301
+	C. 302
+	D. 404
+	→C
+4. forward と sendRedirect の違い	
+	問題： 違うサーバーに遷移する場合、forward と sendRedirect のどちらを使うべきか？
+	
+	A. forward
+	B. sendRedirect
+	→B
+--------------------------------------------------------------------------------------------------------------------------------------------
+	【問題】	次のECサイトの商品購入機能について、画面遷移を設計しなさい。
+		Q1.各画面遷移で forward / redirect のどちらを使うか書きなさい。
+		→単なる画面の切り替わりならforward。完了時の画面遷移はredirect。
+		Q2. DB登録が行われるのはどのタイミングか？
+		→確定ボタンが押されて、完了画面に切り替わる時。
+		Q3. もし「確定 → 完了」を forward にした場合、何が起きるか？
+		→更新をする度に、完了操作(同じ注文)を何度もしてしまう可能性がある。
+	【要件】	
+		■ 画面
+		1. 商品一覧画面（list.jsp）
+		2. 商品詳細画面（detail.jsp）
+		3. 購入入力画面（order.jsp）
+		4. 購入確認画面（confirm.jsp）
+		5. 購入完了画面（complete.jsp）
+		
+		■ 動作仕様
+		商品一覧から商品を選ぶ → 詳細画面へ
+		詳細画面から「購入」ボタン → 入力画面へ
+		入力画面から「確認」ボタン → 確認画面へ
+		確認画面から「確定」ボタン → DB登録 → 完了画面へ
+		更新ボタンで二重購入は防ぎたい
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+	【問題】	会員情報変更機能について、画面遷移を設計しなさい。
+		Q1.各遷移の方法を答えなさい。
+		→入力画面=forward,確認画面=forward,DB更新～完了画面=redirect
+		
+		Q2. URLが変わるのはどのタイミングか
+		→DB更新から完了画面にリダイレクトされるタイミング。
+		Q3. 「入力 → 確認」を redirect にするとどんな問題が起きるか？
+		→一つ一つ全く新しいURLになってしまうので、情報を保持することができない。
+	【要件】	
+		■ 仕様
+		1. マイページ（mypage.jsp）
+		2. 変更入力画面（edit.jsp）
+		3. 確認画面（confirm.jsp）
+		4. 更新完了画面（complete.jsp）
+		
+		■ 動作仕様
+		マイページから「情報変更」ボタン → 入力画面
+		入力画面から「確認」ボタン → 確認画面
+		確認画面から「更新」ボタン → DB更新 → 完了画面
+		更新後にブラウザ更新で再更新が起きないようにする
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+	【問題】	フォワード・インクルード・リダイレクトを使った画面遷移アプリを作成しなさい。
+		
+	【要件】	
+		簡易的なログイン画面 (login.jsp)
+		フォームで username を入力し、validate.jsp に送信
+		バリデーション (validate.jsp)
+		username が空なら error.jsp に forward
+		admin なら admin.jsp に sendRedirect
+		それ以外なら home.jsp に forward
+
+
+					  		  【login.jsp】
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"　pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>ログイン</title>
+</head>
+<body>
+	<%@include file="header.jsp" %>
+	
+	<h2>ログイン画面</h2>
+
+	<form action="validate.jsp" method="post">
+		<label for="username">ユーザー名：</label> 
+		<input type="text" id="username" name="username">
+		<button type="submit">ログイン</button>
+	</form>
+</body>
+</html>
+
+
+
+
+						 	  【validate.jsp】
+
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%
+	//login.jspからの情報を受け取る
+	request.setCharacterEncoding("UTF-8");
+	String username = request.getParamater("username");
+	
+	//空だった場合→error
+	if(username == null || username.trim().isEmpty()){
+%>
+		<jsp:forward page="error.jsp"/>
+<%
+    //OKの場合→admin
+    } else if (username.equals("admin")) {
+        response.sendRedirect(request.getContextPath() + "/login_app/admin.jsp");
+        
+    //それ以外の場合→home
+    } else {
+        request.setAttribute("user", username);
+%>
+        <jsp:forward page="home.jsp" />
+<%
+    }
+%>
+
+
+
+					 		  【error.jsp】
+
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>エラー</title></head>
+<body>
+	<%@include file="header.jsp" %>
+    <h2 style="color: red;">ログインエラー</h2>
+    <p>ユーザー名が入力されていません。</p>
+    <a href="login.jsp">ログイン画面に戻る</a>
+</body>
+</html>
+
+
+
+  							  【admin.jsp】
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<%@include file="header.jsp" %>
+	<h2 style="color: blue;">管理者専用ページ</h2>
+	<p>管理者としてログインしています。</p>
+	<a href="login.jsp">ログアウト</a>
+</body>
+</html>
+
+
+
+							  【home.jsp】
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>ホーム</title></head>
+<body>
+    <%@include file="header.jsp" %>
+    <h2>マイページ</h2>
+    <p>ようこそ、<%= request.getAttribute("user") %> さん！</p>
+    <a href="login.jsp">ログアウト</a>
+</body>
+</html>
